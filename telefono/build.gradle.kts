@@ -44,8 +44,13 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.play.services.tasks)
     implementation(libs.play.services.wearable)
+    // Comunicación con el reloj (Wearable Data Layer)
+    implementation("com.google.android.gms:play-services-wearable:18.1.0")
+
+    // HTTP (si necesitas enviar datos a servidor)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

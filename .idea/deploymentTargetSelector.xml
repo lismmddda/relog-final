@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-11-01T03:33:46.181079600Z">
+        <DropdownSelection timestamp="2025-11-05T00:47:08.060047100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R58X80C0NQM" />
+              <DeviceId pluginId="Default" identifier="serial=10.56.29.246:46463;connection=dba8afc4" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="telefono">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-11-01T03:33:56.783621700Z">
+        <DropdownSelection timestamp="2025-11-05T00:47:00.211742900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=R58X80C0NQM" />
+              <DeviceId pluginId="Default" identifier="serial=10.56.29.246:46463;connection=dba8afc4" />
             </handle>
           </Target>
         </DropdownSelection>

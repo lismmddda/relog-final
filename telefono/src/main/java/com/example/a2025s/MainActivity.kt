@@ -13,7 +13,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.*
 import kotlinx.coroutines.*
 import okhttp3.*
-import java.io.IOException
 import java.nio.charset.StandardCharsets
 
 class MainActivity : AppCompatActivity(),
@@ -22,13 +21,12 @@ class MainActivity : AppCompatActivity(),
     MessageClient.OnMessageReceivedListener,
     CapabilityClient.OnCapabilityChangedListener {
 
-    // === UI ===
     private lateinit var botonConectar: Button
+    private lateinit var botonEnviar: Button
     private lateinit var textInfo: TextView
     private lateinit var textDatos: TextView
     private lateinit var textDetalles: TextView
 
-    // === Variables ===
     private var activityContext: Context? = null
     private var deviceConnected = false
     private lateinit var nodeID: String
@@ -42,6 +40,7 @@ class MainActivity : AppCompatActivity(),
 
         activityContext = this
         botonConectar = findViewById(R.id.boton)
+        botonEnviar = findViewById(R.id.botonEnviar)
         textInfo = findViewById(R.id.textinfo)
         textDatos = findViewById(R.id.textDatos)
         textDetalles = findViewById(R.id.textDetalles)
@@ -51,116 +50,145 @@ class MainActivity : AppCompatActivity(),
                 val tempAct: Activity = activityContext as MainActivity
                 getNodes(tempAct)
             } else {
-                textInfo.text = " Ya estás conectado al reloj"
+                textInfo.text = "✅ Ya estás conectado al reloj"
+            }
+        }
+
+        botonEnviar.setOnClickListener {
+            val datos = textDatos.text.toString().trim()
+            if (datos.isNotBlank()) {
+                textInfo.text = "⏳ Enviando datos al servidor..."
+                sendSensorDataToServer(datos)
+            } else {
+                textInfo.text = "⚠️ No hay datos válidos del reloj"
             }
         }
     }
 
-    // === Conexión con el reloj físico ===
+    // === Buscar reloj conectado ===
     private fun getNodes(context: Context) {
         launch(Dispatchers.IO) {
-            val nodeList = Wearable.getNodeClient(context).connectedNodes
             try {
-                val nodes = Tasks.await(nodeList)
+                val nodes = Tasks.await(Wearable.getNodeClient(context).connectedNodes)
                 if (nodes.isNotEmpty()) {
                     val nodo = nodes.first()
                     nodeID = nodo.id
                     nodeName = nodo.displayName
                     deviceConnected = true
 
-                    Log.d("Nodo", "Conectado al reloj físico: $nodeName ($nodeID)")
-
                     withContext(Dispatchers.Main) {
-                        textInfo.text = "Conectado al reloj "
-                        textDetalles.text = "Reloj: $nodeName\n ID: $nodeID"
+                        textInfo.text = "🔗 Conectado al reloj"
+                        textDetalles.text = "Reloj: $nodeName\nID: $nodeID"
                     }
                 } else {
-                    deviceConnected = false
                     withContext(Dispatchers.Main) {
-                        textInfo.text = "No se encontró ningún reloj ⛔"
-                        textDetalles.text = ""
+                        textInfo.text = "❌ No se encontró ningún reloj conectado"
                     }
                 }
-            } catch (exception: Exception) {
-                Log.e("ErrorNodo", "❌ Error: ${exception.message}")
+            } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    textInfo.text = "Error al conectar con el reloj"
-                    textDetalles.text = ""
+                    textInfo.text = "⚠️ Error al conectar con el reloj: ${e.message}"
                 }
             }
         }
     }
 
-    // === Escuchar mensajes del reloj (sensores) ===
+    // === Recibir datos del reloj ===
     override fun onMessageReceived(event: MessageEvent) {
-        Log.d("Mobile", "Mensaje recibido desde: ${event.sourceNodeId}, ruta: ${event.path}")
-
         if (event.path == "/SENSOR_DATA") {
             val message = String(event.data, StandardCharsets.UTF_8)
-            Log.d("Mobile", "Datos del sensor: $message")
+            Log.d("Mobile", "Datos recibidos del reloj: $message")
 
             runOnUiThread {
-                textDatos.text = message
-            }
+                // Mostrar texto crudo recibido
+                Log.d("RAW_DATA", "Mensaje recibido completo: $message")
 
-            // Enviar datos al servidor local
-            sendSensorDataToServer(message)
-        } else {
-            Log.w("Mobile", "Ruta no reconocida: ${event.path}")
+                val datos = message.split("|").map { it.trim() }
+
+                val builder = StringBuilder()
+                builder.append("📡 Datos recibidos:\n\n")
+                for (dato in datos) {
+                    builder.append("• $dato\n")
+                }
+
+                textDatos.text = builder.toString()
+                textInfo.text = "✅ Datos recibidos correctamente"
+
+                val horaActual = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+                textDetalles.text = "Reloj: $nodeName\nÚltimo dato: $horaActual"
+            }
         }
     }
 
-    // === Enviar datos al servidor PHP/MySQL ===
+    // === Enviar datos PHP ===
+    // === Enviar datos PHP ===
+// === Enviar datos PHP ===
     private fun sendSensorDataToServer(sensorData: String) {
-        // 🔧 URL de tu servidor local (ajusta la IP según tu entorno)
-        val url = "http://192.168.100.27/smartphone/guardar_datos.php?sensor_data=$sensorData"
+        try {
+            Log.d("RAW_SENSOR", "Procesando datos: $sensorData")
 
-        val request = Request.Builder()
-            .url(url)
-            .build()
+            val limpio = sensorData
+                .replace("bpm", "", ignoreCase = true)
+                .replace("lx", "", ignoreCase = true)
+                .replace("rad/s", "", ignoreCase = true)
+                .replace("[^0-9.|:-]".toRegex(), " ")
+                .replace("\\s+".toRegex(), " ")
+                .trim()
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = client.newCall(request).execute()
-                val body = response.body?.string() ?: "Sin respuesta"
+            val numeros = Regex("""([0-9]+(?:\.[0-9]+)?)""").findAll(limpio).map { it.value }.toList()
 
-                Log.d("HTTP", "Respuesta del servidor: $body")
+            if (numeros.size >= 3) {
+                val ritmo = numeros[0]
+                val luz = numeros[1]
+                val gyro = numeros[2]
 
-                withContext(Dispatchers.Main) {
-                    textInfo.text = " Enviado al servidor:\n$body"
+                val url =
+                    "http://10.56.29.1/smartphone/guardar_datos.php?ritmo=$ritmo&luz=$luz&gyro=$gyro"
+                Log.d("HTTP", "Enviando a: $url")
+
+                val request = Request.Builder().url(url).build()
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = client.newCall(request).execute()
+                        val body = response.body?.string() ?: "Sin respuesta"
+                        Log.d("HTTP", "Respuesta del servidor: $body")
+
+                        withContext(Dispatchers.Main) {
+                            textInfo.text = "✅ Enviado al servidor:\n$body"
+                        }
+                    } catch (e: Exception) {
+                        Log.e("HTTP", "Error HTTP: ${e.message}")
+                        withContext(Dispatchers.Main) {
+                            textInfo.text = "⚠️ Error al enviar datos: ${e.message}"
+                        }
+                    }
                 }
-            } catch (e: Exception) {
-                Log.e("HTTP", "Error HTTP: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    textInfo.text = "⚠ Error al enviar datos"
-                }
+            } else {
+                textInfo.text = "⚠️ No se pudieron leer los valores correctamente ($numeros)"
+                Log.e("Parse", "Datos insuficientes: $numeros")
             }
+
+        } catch (e: Exception) {
+            textInfo.text = "⚠️ Error procesando datos: ${e.message}"
         }
     }
 
-    // === Ciclo de vida ===
+
+
     override fun onResume() {
         super.onResume()
-        try {
-            Wearable.getDataClient(this).addListener(this)
-            Wearable.getMessageClient(this).addListener(this)
-            Wearable.getCapabilityClient(this)
-                .addListener(this, Uri.parse("wear://"), CapabilityClient.FILTER_REACHABLE)
-            Log.d("Lifecycle", "Listeners registrados")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        Wearable.getDataClient(this).addListener(this)
+        Wearable.getMessageClient(this).addListener(this)
+        Wearable.getCapabilityClient(this)
+            .addListener(this, Uri.parse("wear://"), CapabilityClient.FILTER_REACHABLE)
     }
 
     override fun onPause() {
         super.onPause()
-        try {
-            Wearable.getDataClient(this).removeListener(this)
-            Wearable.getMessageClient(this).removeListener(this)
-            Wearable.getCapabilityClient(this).removeListener(this)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        Wearable.getDataClient(this).removeListener(this)
+        Wearable.getMessageClient(this).removeListener(this)
+        Wearable.getCapabilityClient(this).removeListener(this)
     }
 
     override fun onDataChanged(p0: DataEventBuffer) {}

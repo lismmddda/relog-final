@@ -1,22 +1,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F9F9F9">
 
     <Button
         android:id="@+id/boton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Conectar con reloj" />
+        android:text="🔗 Conectar con reloj"
+        android:backgroundTint="#4CAF50"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"
+        android:padding="12dp" />
 
     <TextView
         android:id="@+id/textinfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Estado de conexión"
-        android:layout_marginTop="16dp" />
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"
+        android:textColor="#333333" />
 
     <TextView
         android:id="@+id/textDetalles"
@@ -29,8 +37,22 @@
 
     <TextView
         android:id="@+id/textDatos"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Datos del reloj"
-        android:layout_marginTop="24dp" />
+        android:text="📡 Datos del reloj"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:layout_marginTop="24dp"
+        android:background="#E8F5E9"
+        android:textColor="#1B5E20" />
+
+    <Button
+        android:id="@+id/botonEnviar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="💾 Enviar datos al servidor"
+        android:backgroundTint="#2196F3"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="24dp"
+        android:padding="12dp" />
 </LinearLayout>

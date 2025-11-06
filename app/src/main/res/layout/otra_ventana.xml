@@ -3,50 +3,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/textoHeart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ritmo cardiaco: --- bpm"
-        android:padding="4dp"
-        android:textSize="16sp"
+        android:textSize="13sp"
+        android:padding="2dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/textoLight"
-        app:layout_constraintVertical_chainStyle="packed" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/textoLight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Luz: --- lx"
-        android:padding="4dp"
-        android:textSize="16sp"
+        android:textSize="13sp"
+        android:padding="2dp"
         app:layout_constraintTop_toBottomOf="@id/textoHeart"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/botonConectar" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/textoGyro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Giroscopio: --- rad/s"
+        android:textSize="13sp"
+        android:padding="2dp"
+        app:layout_constraintTop_toBottomOf="@id/textoLight"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/botonConectar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Conectar con móvil"
-        android:paddingTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/textoLight"
+        android:text="Conectar"
+        android:textSize="12sp"
+        android:padding="4dp"
+        app:layout_constraintTop_toBottomOf="@id/textoGyro"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/botonEnviar" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/botonEnviar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enviar datos"
-        android:paddingTop="8dp"
+        android:text="Enviar"
+        android:textSize="12sp"
+        android:padding="4dp"
         app:layout_constraintTop_toBottomOf="@id/botonConectar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

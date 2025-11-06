@@ -50,17 +50,17 @@ class MainActivity : AppCompatActivity(),
                 val tempAct: Activity = activityContext as MainActivity
                 getNodes(tempAct)
             } else {
-                textInfo.text = " Ya estás conectado al reloj"
+                textInfo.text = "Ya estás conectado al reloj"
             }
         }
 
         botonEnviar.setOnClickListener {
             val datos = textDatos.text.toString().trim()
             if (datos.isNotBlank()) {
-                textInfo.text = " Enviando datos al servidor..."
+                textInfo.text = "Enviando datos al servidor..."
                 sendSensorDataToServer(datos)
             } else {
-                textInfo.text = " No hay datos válidos del reloj"
+                textInfo.text = "No hay datos válidos del reloj"
             }
         }
     }
@@ -77,17 +77,17 @@ class MainActivity : AppCompatActivity(),
                     deviceConnected = true
 
                     withContext(Dispatchers.Main) {
-                        textInfo.text = " Conectado al reloj"
+                        textInfo.text = "Conectado al reloj"
                         textDetalles.text = "Reloj: $nodeName\nID: $nodeID"
                     }
                 } else {
                     withContext(Dispatchers.Main) {
-                        textInfo.text = " No se encontró ningún reloj conectado"
+                        textInfo.text = "No se encontró ningún reloj conectado"
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    textInfo.text = " Error al conectar con el reloj: ${e.message}"
+                    textInfo.text = "Error al conectar con el reloj: ${e.message}"
                 }
             }
         }
@@ -100,7 +100,6 @@ class MainActivity : AppCompatActivity(),
             Log.d("Mobile", "Datos recibidos del reloj: $message")
 
             runOnUiThread {
-                // Mostrar texto crudo recibido
                 Log.d("RAW_DATA", "Mensaje recibido completo: $message")
 
                 val datos = message.split("|").map { it.trim() }
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity(),
                 }
 
                 textDatos.text = builder.toString()
-                textInfo.text = " Datos recibidos correctamente"
+                textInfo.text = "Datos recibidos correctamente"
 
                 val horaActual = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
                 textDetalles.text = "Reloj: $nodeName\nÚltimo dato: $horaActual"
@@ -120,7 +119,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-
+    // === Enviar datos al servidor (URL Ngrok) ===
     private fun sendSensorDataToServer(sensorData: String) {
         try {
             Log.d("RAW_SENSOR", "Procesando datos: $sensorData")
@@ -140,11 +139,15 @@ class MainActivity : AppCompatActivity(),
                 val luz = numeros[1]
                 val gyro = numeros[2]
 
-                val url =
-                    "http://10.56.29.1/smartphone/guardar_datos.php?ritmo=$ritmo&luz=$luz&gyro=$gyro"
+                // URL Ngrok actual (HTTPS)
+                val baseUrl = "https://bab40d7adbf4.ngrok-free.app/smartphone/guardar_datos.php"
+                val url = "$baseUrl?ritmo=$ritmo&luz=$luz&gyro=$gyro"
                 Log.d("HTTP", "Enviando a: $url")
 
-                val request = Request.Builder().url(url).build()
+                val request = Request.Builder()
+                    .url(url)
+                    .get()
+                    .build()
 
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
@@ -153,26 +156,24 @@ class MainActivity : AppCompatActivity(),
                         Log.d("HTTP", "Respuesta del servidor: $body")
 
                         withContext(Dispatchers.Main) {
-                            textInfo.text = " Enviado al servidor:\n$body"
+                            textInfo.text = "✅ Enviado al servidor:\n$body"
                         }
                     } catch (e: Exception) {
                         Log.e("HTTP", "Error HTTP: ${e.message}")
                         withContext(Dispatchers.Main) {
-                            textInfo.text = " Error al enviar datos: ${e.message}"
+                            textInfo.text = "❌ Error al enviar datos: ${e.message}"
                         }
                     }
                 }
             } else {
-                textInfo.text = " No se pudieron leer los valores correctamente ($numeros)"
+                textInfo.text = "No se pudieron leer los valores correctamente ($numeros)"
                 Log.e("Parse", "Datos insuficientes: $numeros")
             }
 
         } catch (e: Exception) {
-            textInfo.text = " Error procesando datos: ${e.message}"
+            textInfo.text = "Error procesando datos: ${e.message}"
         }
     }
-
-
 
     override fun onResume() {
         super.onResume()

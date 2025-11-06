@@ -50,17 +50,17 @@ class MainActivity : AppCompatActivity(),
                 val tempAct: Activity = activityContext as MainActivity
                 getNodes(tempAct)
             } else {
-                textInfo.text = "✅ Ya estás conectado al reloj"
+                textInfo.text = " Ya estás conectado al reloj"
             }
         }
 
         botonEnviar.setOnClickListener {
             val datos = textDatos.text.toString().trim()
             if (datos.isNotBlank()) {
-                textInfo.text = "⏳ Enviando datos al servidor..."
+                textInfo.text = " Enviando datos al servidor..."
                 sendSensorDataToServer(datos)
             } else {
-                textInfo.text = "⚠️ No hay datos válidos del reloj"
+                textInfo.text = " No hay datos válidos del reloj"
             }
         }
     }
@@ -77,17 +77,17 @@ class MainActivity : AppCompatActivity(),
                     deviceConnected = true
 
                     withContext(Dispatchers.Main) {
-                        textInfo.text = "🔗 Conectado al reloj"
+                        textInfo.text = " Conectado al reloj"
                         textDetalles.text = "Reloj: $nodeName\nID: $nodeID"
                     }
                 } else {
                     withContext(Dispatchers.Main) {
-                        textInfo.text = "❌ No se encontró ningún reloj conectado"
+                        textInfo.text = " No se encontró ningún reloj conectado"
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    textInfo.text = "⚠️ Error al conectar con el reloj: ${e.message}"
+                    textInfo.text = " Error al conectar con el reloj: ${e.message}"
                 }
             }
         }
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(),
                 }
 
                 textDatos.text = builder.toString()
-                textInfo.text = "✅ Datos recibidos correctamente"
+                textInfo.text = " Datos recibidos correctamente"
 
                 val horaActual = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
                 textDetalles.text = "Reloj: $nodeName\nÚltimo dato: $horaActual"
@@ -120,9 +120,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    // === Enviar datos PHP ===
-    // === Enviar datos PHP ===
-// === Enviar datos PHP ===
+
     private fun sendSensorDataToServer(sensorData: String) {
         try {
             Log.d("RAW_SENSOR", "Procesando datos: $sensorData")
@@ -155,22 +153,22 @@ class MainActivity : AppCompatActivity(),
                         Log.d("HTTP", "Respuesta del servidor: $body")
 
                         withContext(Dispatchers.Main) {
-                            textInfo.text = "✅ Enviado al servidor:\n$body"
+                            textInfo.text = " Enviado al servidor:\n$body"
                         }
                     } catch (e: Exception) {
                         Log.e("HTTP", "Error HTTP: ${e.message}")
                         withContext(Dispatchers.Main) {
-                            textInfo.text = "⚠️ Error al enviar datos: ${e.message}"
+                            textInfo.text = " Error al enviar datos: ${e.message}"
                         }
                     }
                 }
             } else {
-                textInfo.text = "⚠️ No se pudieron leer los valores correctamente ($numeros)"
+                textInfo.text = " No se pudieron leer los valores correctamente ($numeros)"
                 Log.e("Parse", "Datos insuficientes: $numeros")
             }
 
         } catch (e: Exception) {
-            textInfo.text = "⚠️ Error procesando datos: ${e.message}"
+            textInfo.text = " Error procesando datos: ${e.message}"
         }
     }
 

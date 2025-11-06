@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity(),
                 val datos = message.split("|").map { it.trim() }
 
                 val builder = StringBuilder()
-                builder.append("📡 Datos recibidos:\n\n")
+                builder.append(" Datos recibidos:\n\n")
                 for (dato in datos) {
                     builder.append("• $dato\n")
                 }
@@ -156,12 +156,12 @@ class MainActivity : AppCompatActivity(),
                         Log.d("HTTP", "Respuesta del servidor: $body")
 
                         withContext(Dispatchers.Main) {
-                            textInfo.text = "✅ Enviado al servidor:\n$body"
+                            textInfo.text = " Enviado al servidor:\n$body"
                         }
                     } catch (e: Exception) {
                         Log.e("HTTP", "Error HTTP: ${e.message}")
                         withContext(Dispatchers.Main) {
-                            textInfo.text = "❌ Error al enviar datos: ${e.message}"
+                            textInfo.text = " Error al enviar datos: ${e.message}"
                         }
                     }
                 }

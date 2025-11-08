@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity(),
         textDatos = findViewById(R.id.textDatos)
         textDetalles = findViewById(R.id.textDetalles)
 
+        // === Botón para conectar con el reloj ===
         botonConectar.setOnClickListener {
             if (!deviceConnected) {
                 val tempAct: Activity = activityContext as MainActivity
@@ -54,10 +55,11 @@ class MainActivity : AppCompatActivity(),
             }
         }
 
+        // === Botón para enviar datos reales del reloj ===
         botonEnviar.setOnClickListener {
             val datos = textDatos.text.toString().trim()
-            if (datos.isNotBlank()) {
-                textInfo.text = "Enviando datos al servidor..."
+            if (datos.isNotBlank() && datos.contains("ritmo")) {
+                textInfo.text = "Enviando datos reales al servidor..."
                 sendSensorDataToServer(datos)
             } else {
                 textInfo.text = "No hay datos válidos del reloj"
@@ -93,19 +95,17 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    // === Recibir datos del reloj ===
+    // === Recibir datos reales del reloj ===
     override fun onMessageReceived(event: MessageEvent) {
         if (event.path == "/SENSOR_DATA") {
             val message = String(event.data, StandardCharsets.UTF_8)
             Log.d("Mobile", "Datos recibidos del reloj: $message")
 
             runOnUiThread {
-                Log.d("RAW_DATA", "Mensaje recibido completo: $message")
-
                 val datos = message.split("|").map { it.trim() }
 
                 val builder = StringBuilder()
-                builder.append(" Datos recibidos:\n\n")
+                builder.append("Datos recibidos del reloj:\n\n")
                 for (dato in datos) {
                     builder.append("• $dato\n")
                 }
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    // === Enviar datos al servidor (URL Ngrok) ===
+    // === Enviar datos reales al servidor ===
     private fun sendSensorDataToServer(sensorData: String) {
         try {
             Log.d("RAW_SENSOR", "Procesando datos: $sensorData")
@@ -139,8 +139,8 @@ class MainActivity : AppCompatActivity(),
                 val luz = numeros[1]
                 val gyro = numeros[2]
 
-                // URL Ngrok actual (HTTPS)
-                val baseUrl = "https://bab40d7adbf4.ngrok-free.app/smartphone/guardar_datos.php"
+
+                val baseUrl = "https://eb1dd901f8e9.ngrok-free.app/smartphone/guardar_datos.php"
                 val url = "$baseUrl?ritmo=$ritmo&luz=$luz&gyro=$gyro"
                 Log.d("HTTP", "Enviando a: $url")
 
@@ -156,17 +156,17 @@ class MainActivity : AppCompatActivity(),
                         Log.d("HTTP", "Respuesta del servidor: $body")
 
                         withContext(Dispatchers.Main) {
-                            textInfo.text = " Enviado al servidor:\n$body"
+                            textInfo.text = "Datos reales enviados al servidor:\n$body"
                         }
                     } catch (e: Exception) {
                         Log.e("HTTP", "Error HTTP: ${e.message}")
                         withContext(Dispatchers.Main) {
-                            textInfo.text = " Error al enviar datos: ${e.message}"
+                            textInfo.text = "Error al enviar datos: ${e.message}"
                         }
                     }
                 }
             } else {
-                textInfo.text = "No se pudieron leer los valores correctamente ($numeros)"
+                textInfo.text = "No se pudieron leer correctamente los valores ($numeros)"
                 Log.e("Parse", "Datos insuficientes: $numeros")
             }
 

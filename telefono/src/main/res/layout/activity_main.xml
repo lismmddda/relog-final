@@ -10,7 +10,7 @@
         android:id="@+id/boton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="🔗 Conectar con reloj"
+        android:text=" Conectar con reloj"
         android:backgroundTint="#4CAF50"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp"
@@ -39,7 +39,7 @@
         android:id="@+id/textDatos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="📡 Datos del reloj"
+        android:text=" A la espera de datos del reloj..."
         android:textSize="16sp"
         android:padding="12dp"
         android:layout_marginTop="24dp"
@@ -50,9 +50,10 @@
         android:id="@+id/botonEnviar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="💾 Enviar datos al servidor"
+        android:text="Registrar datos"
         android:backgroundTint="#2196F3"
         android:textColor="@android:color/white"
         android:layout_marginTop="24dp"
         android:padding="12dp" />
+
 </LinearLayout>
